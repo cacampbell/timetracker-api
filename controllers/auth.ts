@@ -1,6 +1,6 @@
 import { Request, Response } from "express"
 import { hash, genSalt, compare } from "bcrypt"
-import { sign } from "jsonwebtoken"
+import { sign, verify } from "jsonwebtoken"
 import { User } from "../models/user"
 
 async function hashPass(password: string): Promise<string> {
@@ -81,4 +81,25 @@ async function login(request: Request, response: Response): Promise<void> {
     }
 }
 
-export { register, login }
+async function requireLoggedIn(request: Request, response: Response): Promise<void> {
+    const token = request.headers["authorization"]
+    if (token) {
+        if (verify(token!, process.env.JWT_SECRET_KEY!)) {
+            // Do nothing
+        } else {
+            response
+                .status(401)
+                .json({
+                    error: "Unauthorized."
+                })
+        }
+    } else {
+        response
+            .status(401)
+            .json({
+                error: "Unauthorized."
+            })
+    }
+}
+
+export { register, login, requireLoggedIn }
