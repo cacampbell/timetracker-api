@@ -16,4 +16,10 @@ export class User extends Model {
         unique: true
     })
     username!: string;
+
+    @Column({
+        type: DataType.STRING,
+        allowNull: false
+    })
+    hashedPassword!: string;
 }
