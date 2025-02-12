@@ -2,6 +2,7 @@ import express, { Request, Response } from "express"
 import conn from "./db"
 import { register, login, requireLoggedIn } from "./controllers/auth"
 import UserAPI from "./controllers/user"
+import TimesheetAPI from "./controllers/timesheet"
 
 const app = express().use(express.json())
 const port = process.env.PORT || 3001
@@ -16,7 +17,10 @@ app.post("/register", register)
 app.post("/login", login)
 
 // User REST
-app.use(UserAPI, [requireLoggedIn])
+app.use("/user", UserAPI, [requireLoggedIn])
+
+// Timesheet REST
+app.use("/timesheet", TimesheetAPI, [requireLoggedIn])
 
 async function start(): Promise<void> {
     try {
