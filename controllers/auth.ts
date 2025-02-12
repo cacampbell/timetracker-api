@@ -65,10 +65,11 @@ async function login(request: Request, response: Response): Promise<void> {
 
         const payload = request.body
         const username = payload.username
-        const hashedPassword = await hashPass(payload.password)
+        const password = payload.password
+
         const user = await User.findOne({ where: { username: username }})
         if (user) {
-            if (await compare(user.hashedPassword, hashedPassword)) {
+            if (await compare(password, user.hashedPassword)) {
                 const accessToken = generateAccessToken({
                     username: username,
                     id: user.id
@@ -103,7 +104,6 @@ async function login(request: Request, response: Response): Promise<void> {
 }
 
 function requireLoggedIn(request: Request, response: Response, next: NextFunction): void {
-    console.log("running")
     const token = request.headers["authorization"]
     if (token) {
         if (verify(token!, process.env.JWT_SECRET_KEY!)) {

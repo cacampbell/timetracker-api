@@ -1,12 +1,13 @@
-import { Table, Model, Column, DataType } from "sequelize-typescript"
+import { Table, Model, Column, PrimaryKey, Default, DataType } from "sequelize-typescript"
 
 @Table({
     tableName: "timesheet"
 })
 export class Timesheet extends Model {
+    @PrimaryKey
+    @Default(DataType.UUIDV4)
     @Column({
-        type: DataType.UUID,
-        primaryKey: true
+        type: DataType.UUID
     })
     id!: string;
 
