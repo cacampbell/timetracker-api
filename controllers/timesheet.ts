@@ -5,11 +5,6 @@ import { Timesheet } from "../models/timesheet"
 const router = Router()
 
 async function create(request: Request, response: Response): Promise<void> {
-    body("description").isString()
-    body("rate").isNumeric()
-    body("totalTime").isNumeric()
-    body("totalCost").isNumeric()
-    
     const errors = validationResult(request)
     if (!errors.isEmpty()) {
         response
@@ -17,6 +12,7 @@ async function create(request: Request, response: Response): Promise<void> {
             .json({
                 errors: errors.array()
             })
+        return;
     }
     
     const timesheet = await Timesheet.create()
@@ -45,8 +41,6 @@ async function getAll(request: Request, response: Response): Promise<void> {
 }
 
 async function getById(request: Request, response: Response): Promise<void> {
-    param("id").isUUID()
-    
     const errors = validationResult(request)
     if (!errors.isEmpty()) {
         response
@@ -54,6 +48,7 @@ async function getById(request: Request, response: Response): Promise<void> {
             .json({
                 errors: errors.array()
             })
+        return;
     }
 
     const id = request.params.id
@@ -72,13 +67,7 @@ async function getById(request: Request, response: Response): Promise<void> {
     }
 }
 
-async function save(request: Request, response: Response): Promise<void> {
-    param("id").isUUID()
-    body("description").isString()
-    body("rate").isNumeric()
-    body("totalTime").isNumeric()
-    body("totalCost").isNumeric()
-    
+async function save(request: Request, response: Response): Promise<void> {    
     const errors = validationResult(request)
     if (!errors.isEmpty()) {
         response
@@ -86,6 +75,7 @@ async function save(request: Request, response: Response): Promise<void> {
             .json({
                 errors: errors.array()
             })
+        return;
     }
     
     const id = request.params.id
@@ -106,8 +96,6 @@ async function save(request: Request, response: Response): Promise<void> {
 }
 
 async function remove(request: Request, response: Response): Promise<void> {
-    param("id").isUUID()
-    
     const errors = validationResult(request)
     if (!errors.isEmpty()) {
         response
@@ -115,6 +103,7 @@ async function remove(request: Request, response: Response): Promise<void> {
             .json({
                 errors: errors.array()
             })
+        return;
     }
 
     const id = request.params.id
@@ -134,10 +123,40 @@ async function remove(request: Request, response: Response): Promise<void> {
     }
 }
 
-router.post("/", create)
-router.get("/", getAll)
-router.get("/:id", getById)
-router.patch("/:id", save)
-router.delete("/:id", remove)
+router.post(
+    "/",
+    body("description").isString(),
+    body("rate").isNumeric(),
+    body("totalTime").isNumeric(),
+    body("totalCost").isNumeric(),
+    create
+)
+
+router.get(
+    "/", 
+    getAll
+)
+
+router.get(
+    "/:id",
+    param("id").isUUID(),
+    getById
+)
+
+router.patch(
+    "/:id",
+    param("id").isUUID(),
+    body("description").isString(),
+    body("rate").isNumeric(),
+    body("totalTime").isNumeric(),
+    body("totalCost").isNumeric(),
+    save
+)
+
+router.delete(
+    "/:id",
+    param("id").isUUID(),
+    remove
+)
 
 export default router;

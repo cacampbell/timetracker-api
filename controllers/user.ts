@@ -12,8 +12,6 @@ async function getAll(request: Request, response: Response): Promise<void> {
 }
 
 async function getById(request: Request, response: Response): Promise<void> {
-    param("id").isUUID()
-    
     const errors = validationResult(request)
     if (!errors.isEmpty()) {
         response
@@ -21,8 +19,9 @@ async function getById(request: Request, response: Response): Promise<void> {
             .json({
                 errors: errors.array()
             })
+        return;
     }
-
+    
     const id = request.params.id
     const user = await User.findOne({ where: { id }})
     
@@ -40,10 +39,6 @@ async function getById(request: Request, response: Response): Promise<void> {
 }
 
 async function save(request: Request, response: Response): Promise<void> {
-    param("id").isUUID()
-    body("username").isString()
-    body("password").isString()
-    
     const errors = validationResult(request)
     if (!errors.isEmpty()) {
         response
@@ -51,6 +46,7 @@ async function save(request: Request, response: Response): Promise<void> {
             .json({
                 errors: errors.array()
             })
+        return;
     }
     
     const id = request.params.id
@@ -71,8 +67,6 @@ async function save(request: Request, response: Response): Promise<void> {
 }
 
 async function remove(request: Request, response: Response): Promise<void> {
-    param("id").isUUID()
-    
     const errors = validationResult(request)
     if (!errors.isEmpty()) {
         response
@@ -80,6 +74,7 @@ async function remove(request: Request, response: Response): Promise<void> {
             .json({
                 errors: errors.array()
             })
+        return;
     }
     
     const id = request.params.id
@@ -99,9 +94,29 @@ async function remove(request: Request, response: Response): Promise<void> {
     }
 }
 
-router.get("/", getAll)
-router.get("/:id", getById)
-router.patch("/:id", save)
-router.delete("/:id", remove)
+router.get(
+    "/", 
+    getAll
+)
+
+router.get(
+    "/:id",
+    param("id").isUUID(),
+    getById
+)
+
+router.patch(
+    "/:id",
+    param("id").isUUID(),
+    body("username").isString(),
+    body("password").isString(),
+    save
+)
+
+router.delete(
+    "/:id",
+    param("id").isUUID(),
+    remove
+)
 
 export default router;

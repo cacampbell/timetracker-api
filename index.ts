@@ -1,4 +1,5 @@
 import express, { Request, Response } from "express"
+import { body } from "express-validator"
 import { register, login, requireLoggedIn } from "./controllers/auth"
 import UserAPI from "./controllers/user"
 import TimesheetAPI from "./controllers/timesheet"
@@ -20,19 +21,26 @@ app.get("/", (req: Request, resp: Response) => {
 
 // JWT Auth
 app.post(
-    "/register", 
+    "/register",
+    body("username").isString().isLength({ min: 8 }),
+    body("password").isString().isLength({ min: 8 }),
     register
 )
-app.post("/login", login)
+app.post(
+    "/login",
+    body("username").isString().isLength({ min: 8 }),
+    body("password").isString().isLength({ min: 8 }),
+    login
+)
 
 // User REST
-app.use("/user", UserAPI, [requireLoggedIn])
+app.use("/user", requireLoggedIn, UserAPI)
 
 // Timesheet REST
-app.use("/timesheet", TimesheetAPI, [requireLoggedIn])
+app.use("/timesheet", requireLoggedIn, TimesheetAPI)
 
 // LineItem REST
-app.use("/lineitem", LineItemAPI, [requireLoggedIn])
+app.use("/lineitem", requireLoggedIn, LineItemAPI)
 
 async function start(): Promise<void> {
     try {

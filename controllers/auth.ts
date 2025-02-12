@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express"
-import { body, validationResult } from "express-validator"
+import { validationResult } from "express-validator"
 import { hash, genSalt, compare } from "bcrypt"
 import { sign, verify } from "jsonwebtoken"
 import { User } from "../models/user"
@@ -15,9 +15,6 @@ function generateAccessToken(message: object): string {
 
 async function register(request: Request, response: Response): Promise<void> {
     try {
-        body("username").isString()
-        body("password").isString()
-        
         const errors = validationResult(request)
         if (!errors.isEmpty()) {
             response
@@ -25,6 +22,7 @@ async function register(request: Request, response: Response): Promise<void> {
                 .json({
                     errors: errors.array()
                 })
+            return;
         }
 
         const payload = request.body
@@ -55,9 +53,6 @@ async function register(request: Request, response: Response): Promise<void> {
 
 async function login(request: Request, response: Response): Promise<void> {
     try {
-        body("username").isString()
-        body("password").isString()
-        
         const errors = validationResult(request)
         if (!errors.isEmpty()) {
             response
@@ -65,8 +60,9 @@ async function login(request: Request, response: Response): Promise<void> {
                 .json({
                     errors: errors.array()
                 })
+            return;
         }
-        
+
         const payload = request.body
         const username = payload.username
         const hashedPassword = await hashPass(payload.password)
@@ -106,7 +102,8 @@ async function login(request: Request, response: Response): Promise<void> {
     }
 }
 
-async function requireLoggedIn(request: Request, response: Response, next: NextFunction): Promise<void> {
+function requireLoggedIn(request: Request, response: Response, next: NextFunction): void {
+    console.log("running")
     const token = request.headers["authorization"]
     if (token) {
         if (verify(token!, process.env.JWT_SECRET_KEY!)) {
@@ -117,6 +114,7 @@ async function requireLoggedIn(request: Request, response: Response, next: NextF
                 .json({
                     error: "Unauthorized."
                 })
+            return;
         }
     } else {
         response
@@ -124,6 +122,7 @@ async function requireLoggedIn(request: Request, response: Response, next: NextF
             .json({
                 error: "Unauthorized."
             })
+        return;
     }
 }
 
