@@ -3,6 +3,7 @@ import conn from "./db"
 import { register, login, requireLoggedIn } from "./controllers/auth"
 import UserAPI from "./controllers/user"
 import TimesheetAPI from "./controllers/timesheet"
+import LineItemAPI from "./controllers/lineitem"
 
 const app = express().use(express.json())
 const port = process.env.PORT || 3001
@@ -21,6 +22,9 @@ app.use("/user", UserAPI, [requireLoggedIn])
 
 // Timesheet REST
 app.use("/timesheet", TimesheetAPI, [requireLoggedIn])
+
+// LineItem REST
+app.use("/lineitem", LineItemAPI, [requireLoggedIn])
 
 async function start(): Promise<void> {
     try {
