@@ -1,6 +1,7 @@
 import express, { Request, Response } from "express"
 import conn from "./db"
-import { register, login } from "./controllers/auth"
+import { register, login, requireLoggedIn } from "./controllers/auth"
+import UserAPI from "./controllers/user"
 
 const app = express().use(express.json())
 const port = process.env.PORT || 3001
@@ -13,6 +14,9 @@ app.get("/", (req: Request, resp: Response) => {
 // JWT Auth
 app.post("/register", register)
 app.post("/login", login)
+
+// User REST
+app.use(UserAPI, [requireLoggedIn])
 
 async function start(): Promise<void> {
     try {

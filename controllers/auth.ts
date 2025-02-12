@@ -69,7 +69,7 @@ async function login(request: Request, response: Response): Promise<void> {
             response
                 .status(404)
                 .json({
-                    error: "User not found."
+                    error: "Not found."
                 })
         }
     } catch {
