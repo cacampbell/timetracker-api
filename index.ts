@@ -1,10 +1,15 @@
 import express, { Request, Response } from "express"
-import conn from "./db"
 import { register, login, requireLoggedIn } from "./controllers/auth"
 import UserAPI from "./controllers/user"
 import TimesheetAPI from "./controllers/timesheet"
 import LineItemAPI from "./controllers/lineitem"
+import { config as dotenvConfig } from "dotenv";
 
+// Load Env, DB Connection
+dotenvConfig()
+import conn from "./db"
+
+// Handle JSON on PORT
 const app = express().use(express.json())
 const port = process.env.PORT || 3001
 
@@ -14,7 +19,10 @@ app.get("/", (req: Request, resp: Response) => {
 })
 
 // JWT Auth
-app.post("/register", register)
+app.post(
+    "/register", 
+    register
+)
 app.post("/login", login)
 
 // User REST

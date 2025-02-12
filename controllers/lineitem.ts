@@ -1,13 +1,27 @@
 import { Router, Request, Response } from "express"
+import { body, param, validationResult } from "express-validator"
 import { LineItem } from "../models/lineitem"
 
 const router = Router()
 
 async function create(request: Request, response: Response): Promise<void> {
+    body("date").isDate()
+    body("minutes").isNumeric()
+    
+    const errors = validationResult(request)
+    if (!errors.isEmpty()) {
+        response
+            .status(400)
+            .json({
+                errors: errors.array()
+            })
+    }
+
     const lineitem = await LineItem.create()
     await lineitem.update({
         ...request.body
     })
+
     if (lineitem) {
         response
             .status(200)
@@ -29,8 +43,20 @@ async function getAll(request: Request, response: Response): Promise<void> {
 }
 
 async function getById(request: Request, response: Response): Promise<void> {
+    param("id").isUUID()
+    
+    const errors = validationResult(request)
+    if (!errors.isEmpty()) {
+        response
+            .status(400)
+            .json({
+                errors: errors.array()
+            })
+    }
+
     const id = request.params.id
     const lineitem = await LineItem.findOne({ where: { id }})
+    
     if (lineitem) {
         response
             .status(200)
@@ -45,8 +71,22 @@ async function getById(request: Request, response: Response): Promise<void> {
 }
 
 async function save(request: Request, response: Response): Promise<void> {
+    param("id").isUUID()
+    body("date").isDate()
+    body("minutes").isNumeric()
+    
+    const errors = validationResult(request)
+    if (!errors.isEmpty()) {
+        response
+            .status(400)
+            .json({
+                errors: errors.array()
+            })
+    }
+    
     const id = request.params.id
     const lineitem = await LineItem.findOne({ where: { id }})
+    
     if (lineitem) {
         await lineitem.update({
             ...request.body
@@ -62,8 +102,20 @@ async function save(request: Request, response: Response): Promise<void> {
 }
 
 async function remove(request: Request, response: Response): Promise<void> {
+    param("id").isUUID()
+    
+    const errors = validationResult(request)
+    if (!errors.isEmpty()) {
+        response
+            .status(400)
+            .json({
+                errors: errors.array()
+            })
+    }
+    
     const id = request.params.id
     const lineitem = await LineItem.findOne({ where: { id }})
+    
     if (lineitem) {
         await LineItem.destroy({ where: { id }})
         response

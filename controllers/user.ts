@@ -1,4 +1,5 @@
 import { Router, Request, Response } from "express"
+import { body, param, validationResult } from "express-validator"
 import { User } from "../models/user"
 
 const router = Router()
@@ -11,8 +12,20 @@ async function getAll(request: Request, response: Response): Promise<void> {
 }
 
 async function getById(request: Request, response: Response): Promise<void> {
+    param("id").isUUID()
+    
+    const errors = validationResult(request)
+    if (!errors.isEmpty()) {
+        response
+            .status(400)
+            .json({
+                errors: errors.array()
+            })
+    }
+
     const id = request.params.id
     const user = await User.findOne({ where: { id }})
+    
     if (user) {
         response
             .status(200)
@@ -27,8 +40,22 @@ async function getById(request: Request, response: Response): Promise<void> {
 }
 
 async function save(request: Request, response: Response): Promise<void> {
+    param("id").isUUID()
+    body("username").isString()
+    body("password").isString()
+    
+    const errors = validationResult(request)
+    if (!errors.isEmpty()) {
+        response
+            .status(400)
+            .json({
+                errors: errors.array()
+            })
+    }
+    
     const id = request.params.id
     const user = await User.findOne({ where: { id }})
+    
     if (user) {
         await user.update({
             ...request.body
@@ -44,8 +71,20 @@ async function save(request: Request, response: Response): Promise<void> {
 }
 
 async function remove(request: Request, response: Response): Promise<void> {
+    param("id").isUUID()
+    
+    const errors = validationResult(request)
+    if (!errors.isEmpty()) {
+        response
+            .status(400)
+            .json({
+                errors: errors.array()
+            })
+    }
+    
     const id = request.params.id
     const user = await User.findOne({ where: { id }})
+    
     if (user) {
         await User.destroy({ where: { id }})
         response

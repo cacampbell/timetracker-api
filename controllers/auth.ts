@@ -1,4 +1,5 @@
-import { Request, Response } from "express"
+import { NextFunction, Request, Response } from "express"
+import { body, validationResult } from "express-validator"
 import { hash, genSalt, compare } from "bcrypt"
 import { sign, verify } from "jsonwebtoken"
 import { User } from "../models/user"
@@ -14,6 +15,18 @@ function generateAccessToken(message: object): string {
 
 async function register(request: Request, response: Response): Promise<void> {
     try {
+        body("username").isString()
+        body("password").isString()
+        
+        const errors = validationResult(request)
+        if (!errors.isEmpty()) {
+            response
+                .status(400)
+                .json({
+                    errors: errors.array()
+                })
+        }
+
         const payload = request.body
         const username = payload.username
         const hashedPass = await hashPass(payload.password)
@@ -42,6 +55,18 @@ async function register(request: Request, response: Response): Promise<void> {
 
 async function login(request: Request, response: Response): Promise<void> {
     try {
+        body("username").isString()
+        body("password").isString()
+        
+        const errors = validationResult(request)
+        if (!errors.isEmpty()) {
+            response
+                .status(400)
+                .json({
+                    errors: errors.array()
+                })
+        }
+        
         const payload = request.body
         const username = payload.username
         const hashedPassword = await hashPass(payload.password)
@@ -81,11 +106,11 @@ async function login(request: Request, response: Response): Promise<void> {
     }
 }
 
-async function requireLoggedIn(request: Request, response: Response): Promise<void> {
+async function requireLoggedIn(request: Request, response: Response, next: NextFunction): Promise<void> {
     const token = request.headers["authorization"]
     if (token) {
         if (verify(token!, process.env.JWT_SECRET_KEY!)) {
-            // Do nothing
+            next()
         } else {
             response
                 .status(401)
