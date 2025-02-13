@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express"
 import { validationResult } from "express-validator"
 import { hash, genSalt, compare } from "bcrypt"
-import { sign, verify } from "jsonwebtoken"
+import { JsonWebTokenError, sign, verify } from "jsonwebtoken"
 import { User } from "../models/user"
 
 async function hashPass(password: string): Promise<string> {
@@ -106,15 +106,17 @@ async function login(request: Request, response: Response): Promise<void> {
 function requireLoggedIn(request: Request, response: Response, next: NextFunction): void {
     const token = request.headers["authorization"]
     if (token) {
-        if (verify(token!, process.env.JWT_SECRET_KEY!)) {
+        try {
+            verify(token!, process.env.JWT_SECRET_KEY!)
             next()
-        } else {
-            response
-                .status(401)
-                .json({
-                    error: "Unauthorized."
-                })
-            return;
+        } catch (error) {
+            if (error instanceof JsonWebTokenError) {
+                response
+                    .status(401)
+                    .json({
+                        error: "Invalid token."
+                    })
+            }
         }
     } else {
         response
