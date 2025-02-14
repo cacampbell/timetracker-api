@@ -28,6 +28,18 @@ async function register(request: Request, response: Response): Promise<void> {
         const payload = request.body
         const username = payload.username
         const hashedPass = await hashPass(payload.password)
+
+        // Check if this user already exists
+        const user = await User.findOne({ where: { username }})
+        if (user) {
+            response
+                .status(401)
+                .json({
+                    error: "Username already registered."
+                })
+            return;
+        }
+
         const newUser = await User.create({
             username: username,
             hashedPassword: hashedPass
@@ -42,12 +54,9 @@ async function register(request: Request, response: Response): Promise<void> {
                 user: newUser.toJSON(),
                 token: accessToken
             })
-    } catch {
+    } catch (error) {
         response
             .status(500)
-            .json({
-                error: "Internal error."
-            })
     }
 }
 
@@ -98,9 +107,6 @@ async function login(request: Request, response: Response): Promise<void> {
     } catch {
         response
             .status(500)
-            .json({
-                error: "Internal error."
-            })
     }
 }
 
