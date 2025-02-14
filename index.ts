@@ -1,9 +1,10 @@
 import express, { Request, Response } from "express"
-import { body } from "express-validator"
+import { param, body } from "express-validator"
 import { register, login, requireLoggedIn } from "./controllers/auth"
 import UserAPI from "./controllers/user"
 import TimesheetAPI from "./controllers/timesheet"
 import LineItemAPI from "./controllers/lineitem"
+import { getTimeshsheetsForUser, getLineitemsForTimesheet } from "./controllers/custom"
 import { config as dotenvConfig } from "dotenv";
 
 // Load Env, DB Connection
@@ -49,6 +50,21 @@ app.use("/timesheet", requireLoggedIn, TimesheetAPI)
 
 // LineItem REST
 app.use("/lineitem", requireLoggedIn, LineItemAPI)
+
+// Special controllers
+app.get(
+    "/timesheets-for-user/:id",
+    param("id").isUUID(),
+    requireLoggedIn,
+    getTimeshsheetsForUser
+)
+
+app.get(
+    "/lineitems-for-timesheet/:id",
+    param("id").isUUID(),
+    requireLoggedIn,
+    getLineitemsForTimesheet
+)
 
 async function start(): Promise<void> {
     try {
