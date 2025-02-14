@@ -39,7 +39,7 @@ async function getLineitemsForTimesheet(request: Request, response: Response): P
             return;
         }
 
-        const lineitems = LineItem.findAll({ where: { TimesheetId: request.params.id }})
+        const lineitems = await LineItem.findAll({ where: { TimesheetId: request.params.id }})
         response
             .status(200)
             .json({

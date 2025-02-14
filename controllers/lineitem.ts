@@ -33,10 +33,10 @@ async function create(request: Request, response: Response): Promise<void> {
 }
 
 async function getAll(request: Request, response: Response): Promise<void> {
-    const allSheets = await LineItem.findAll()
+    const allitems = await LineItem.findAll()
     response
         .status(200)
-        .json(allSheets)
+        .json(allitems)
 }
 
 async function getById(request: Request, response: Response): Promise<void> {
