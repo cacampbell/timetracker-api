@@ -16,11 +16,7 @@ async function create(request: Request, response: Response): Promise<void> {
     }
     
     const timesheet = await Timesheet.create({
-        UserId: request.body.userId,
-        description: request.body.description,
-        rate: request.body.rate,
-        totalCost: request.body.totalCost,
-        totalTime: request.body.totalTime
+        ...request.body
     })
 
     if (timesheet) {
