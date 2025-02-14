@@ -15,8 +15,7 @@ async function create(request: Request, response: Response): Promise<void> {
         return;
     }
 
-    const lineitem = await LineItem.create()
-    await lineitem.update({
+    const lineitem = await LineItem.create({
         ...request.body
     })
 
