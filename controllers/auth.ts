@@ -77,6 +77,7 @@ async function login(request: Request, response: Response): Promise<void> {
                 response
                     .status(200)
                     .json({
+                        user: user.toJSON(),
                         token: accessToken
                     })
             } else {
